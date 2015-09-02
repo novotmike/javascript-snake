@@ -4,16 +4,15 @@
 	<meta charset="UTF-8" />
 	<title>Snake game</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-
 </head>
 <body>
 <div id="header">
-	<header>
-	<img src="images/logo.jpg" /></header>
+	<header>SNAKE GAME</header>
 </div>
 <script>
-	var COLUMNS = 27;
-	var ROWS	= 27;
+	
+	var COLUMNS = 26;
+	var ROWS	= 26;
 	var EMPTY	= 0;
 	var SNAKE 	= 1;
 	var FOOD	= 2;
@@ -53,11 +52,7 @@
 		},
 
 		get: function(x, y) {
-			if(x < 0 || x > COLUMNS-1) {
-				return EMPTY;
-			}else {
-				return this._grid[x][y];
-			}
+			return this._grid[x][y];
 		}
 	}
 
@@ -105,14 +100,11 @@
 
 
 	function main() {
-		var div = document.createElement('main');
 		canvas = document.createElement("canvas");
 		canvas.width 	= COLUMNS*20;
 		canvas.height 	= ROWS*20
 		ctx = canvas.getContext("2d");
-		div.appendChild(canvas);
-
-		document.body.appendChild(div);
+		document.body.appendChild(canvas);
 
 		ctx.font = "12px Tahoma";
 
@@ -221,12 +213,10 @@
 					break;
 			}
 
-			if(grid.get(nx, ny) === SNAKE) {
+			if(0 > nx || nx > grid.width-1 || 
+				0 > ny || ny > grid.height-1 || grid.get(nx, ny) === SNAKE) {
 				return init();
 			}
-
-			//0 > nx || nx > grid.width-1 || 
-				//0 > ny || ny > grid.height-1 ||
 
 			if(grid.get(nx, ny) === FOOD) {
 				var tail = {x:nx, y:ny};
@@ -235,23 +225,8 @@
 			}else {
 				var tail = snake.remove();
 				grid.set(EMPTY, tail.x, tail.y);
-
-				if(ny < 0) {
-					tail.x = nx;
-					tail.y = ROWS;
-				}else if(nx < 0) {
-					tail.x = COLUMNS-1;
-					tail.y = ny;
-				}else if(ny > grid.height-1){
-					tail.x = nx;
-					tail.y = 0;
-				}else if(nx > grid.width-1) {
-					tail.x = 0;
-					tail.y = ny;
-				}else {
-					tail.x = nx;
-					tail.y = ny;
-				}
+				tail.x = nx;
+				tail.y = ny;
 			}
 			grid.set(SNAKE, tail.x, tail.y);
 
@@ -269,10 +244,6 @@
 				switch(grid.get(x, y)) {
 					case EMPTY:
 						ctx.fillStyle = "#fff";
-						if((x%2 === 0 && y%2 === 0) || (x%2 === 1 && y%2 === 1)) {
-							ctx.fillStyle = "#eee";
-						}
-						
 						break;
 					case SNAKE:
 						ctx.fillStyle = "#00f";
@@ -306,8 +277,9 @@
 	}
 	main();
 </script>
-<footer>
+
+<div id="footer">
 <p>Created by IOT-MASTERS copyright&copy 2015</p>
-</footer>
+</div>
 </body>
 </html>

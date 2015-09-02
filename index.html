@@ -1,285 +1,358 @@
-<!doctype <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8" />
-	<title>Snake game</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-</head>
-<body>
-<div id="header">
-	<header>SNAKE GAME</header>
-</div>
-<script>
-	
-	var COLUMNS = 26;
-	var ROWS	= 26;
-	var EMPTY	= 0;
-	var SNAKE 	= 1;
-	var FOOD	= 2;
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
 
-	var LEFT 	= 0;
-	var UP 		= 1;
-	var RIGHT	= 2;
-	var DOWN 	= 3;
-	//GAMESTATES
-	var PAUSE = false;
-	var START = true;
-	var NOTSUPORTED = false;
-	//keycodes:
-	var KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40;
-	var KEY_SPACE = 32, KEY_EASY = 0;
+    <title>Cover Template for Bootstrap</title>
 
-	var grid = {
-		width: null,
-		height: null,
-		_grid: null,
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
-		init: function(d, col, row) {
-			this.width 	= col;
-			this.height = row;
-
-			this._grid = [];
-			for (var i = 0; i < col; i++) {
-				this._grid.push([]);
-				for (var j = 0; j < row; j++) {
-					this._grid[i].push(d);
-				}
-			}
-		},
-
-		set: function(val, x, y) {
-			this._grid[x][y] = val;
-		},
-
-		get: function(x, y) {
-			return this._grid[x][y];
-		}
-	}
-
-	var snake = {
-		direction: null,
-		last: null, 
-		_queue: null,
-
-		init: function(d, x, y) {
-			this.direction = d;
-
-			this._queue = [];
-			this.insert(x,y);
-
-		},
-
-		insert: function(x, y) {
-			this._queue.unshift({x:x, y:y});
-			this.last = this._queue[0];
-		},
-
-		remove: function() {
-			return this._queue.pop();
-		}
-	}
-
-	function setFood() {
-		var empty = [];
-
-		for (var x = 0; x < grid.width; x++) {
-			for (var y = 0; y < grid.height; y++) {
-					if(grid.get(x,y) === EMPTY) {
-						empty.push({x:x, y:y});
-					}
-			}
-		}
-
-		var randomPosition = empty[Math.floor(Math.random()*empty.length)];
-		grid.set(FOOD, randomPosition.x, randomPosition.y);
-
-	}
-
-	//GAME OBJECTS
-	var canvas, ctx, keystate, frames, score;
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
 
 
-	function main() {
-		canvas = document.createElement("canvas");
-		canvas.width 	= COLUMNS*20;
-		canvas.height 	= ROWS*20
-		ctx = canvas.getContext("2d");
-		document.body.appendChild(canvas);
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
 
-		ctx.font = "12px Tahoma";
+  <body>
 
-		frames = 0;
-		keystate = {};
+    <div class="site-wrapper">
 
-		document.addEventListener("keydown", function(evt) {
-			keystate[evt.keyCode] = true;
-		});
-		document.addEventListener("keyup", function(evt) {
-			delete keystate[evt.keyCode];
-		});
+      <div class="site-wrapper-inner">
 
-		if ("WebSocket" in window) {
-		var ws = new WebSocket("ws://192.168.201.245:9000/servers/00000001/events?topic=200%2F20202066%2Fstate");
+        <div class="cover-container">
 
-			ws.onopen = function() {
-				console.log("Websocket opened!");
-			};
+    <header>
+    <h1>eClub Snake</h1>
+    </header>
 
-			ws.onmessage = function(evt) {
-				var dt = JSON.parse(evt.data).data;
-				if(dt === 'thatWasEasy') {
-					keystate[KEY_EASY] = true;
-				}else if(dt === 'thatWasHard') {
-					keystate[KEY_EASY] = false;
-				}
-			};
+          <div class="inner cover">
+            <script>
+  var COLUMNS = 27;
+  var ROWS  = 27;
+  var EMPTY = 0;
+  var SNAKE   = 1;
+  var FOOD  = 2;
 
-			ws.onclose = function() {
-				console.log("Websocket closed!");
-			}
-		}else {
-			NOTSUPORTED = true;
-		}
+  var LEFT  = 0;
+  var UP    = 1;
+  var RIGHT = 2;
+  var DOWN  = 3;
+  //GAMESTATES
+  var PAUSE = false;
+  var START = true;
+  var NOTSUPORTED = false;
+  //keycodes:
+  var KEY_LEFT = 37, KEY_UP = 38, KEY_RIGHT = 39, KEY_DOWN = 40;
+  var KEY_SPACE = 32, KEY_EASY = 0;
 
-		init();
+  var grid = {
+    width: null,
+    height: null,
+    _grid: null,
 
-		loop();
-	}
+    init: function(d, col, row) {
+      this.width  = col;
+      this.height = row;
 
+      this._grid = [];
+      for (var i = 0; i < col; i++) {
+        this._grid.push([]);
+        for (var j = 0; j < row; j++) {
+          this._grid[i].push(d);
+        }
+      }
+    },
 
-	function init() {
-		START = true;
-		PAUSE = false;
-		score = 0;
-		grid.init(EMPTY, COLUMNS, ROWS);
-		var sp = {x:Math.floor(COLUMNS/2), y:ROWS-1}
-		snake.init(UP, sp.x, sp.y);
-		grid.set(SNAKE, sp.x, sp.y);
+    set: function(val, x, y) {
+      this._grid[x][y] = val;
+    },
 
-		setFood();
-	}
+    get: function(x, y) {
+      if(x < 0 || x > COLUMNS-1) {
+        return EMPTY;
+      }else {
+        return this._grid[x][y];
+      }
+    }
+  }
 
+  var snake = {
+    direction: null,
+    last: null, 
+    _queue: null,
 
-	function loop() {
-		if(keystate[KEY_SPACE] || keystate[KEY_EASY]) {
-			if(START !== true)
-				PAUSE = !PAUSE;
+    init: function(d, x, y) {
+      this.direction = d;
 
-			START = false;
-			delete keystate[KEY_SPACE];
-			delete keystate[KEY_EASY];
-		}
+      this._queue = [];
+      this.insert(x,y);
 
-		if(!PAUSE && !START) {
-			update();
-		}
-		draw();
+    },
 
-		window.requestAnimationFrame(loop, canvas);
-	}
+    insert: function(x, y) {
+      this._queue.unshift({x:x, y:y});
+      this.last = this._queue[0];
+    },
 
-	function update() {
-		frames++;
+    remove: function() {
+      return this._queue.pop();
+    }
+  }
 
-		if(keystate[KEY_LEFT] && snake.direction !== RIGHT) {
-			snake.direction = LEFT;
-		}
-		if(keystate[KEY_UP] && snake.direction !== DOWN) {
-			snake.direction = UP;
-		}
-		if(keystate[KEY_RIGHT] && snake.direction !== LEFT) {
-			snake.direction = RIGHT;
-		}
-		if(keystate[KEY_DOWN] && snake.direction !== UP) {
-			snake.direction = DOWN;
-		}
+  function setFood() {
+    var empty = [];
 
-		if(frames%5 === 0) {
-			var nx = snake.last.x;
-			var ny = snake.last.y;
+    for (var x = 0; x < grid.width; x++) {
+      for (var y = 0; y < grid.height; y++) {
+          if(grid.get(x,y) === EMPTY) {
+            empty.push({x:x, y:y});
+          }
+      }
+    }
 
-			switch(snake.direction) {
-				case LEFT: 
-					nx--;
-					break;
-				case UP:
-					ny--;
-					break;
-				case RIGHT:
-					nx++;
-					break;
-				case DOWN:
-					ny++;
-					break;
-			}
+    var randomPosition = empty[Math.floor(Math.random()*empty.length)];
+    grid.set(FOOD, randomPosition.x, randomPosition.y);
 
-			if(0 > nx || nx > grid.width-1 || 
-				0 > ny || ny > grid.height-1 || grid.get(nx, ny) === SNAKE) {
-				return init();
-			}
+  }
 
-			if(grid.get(nx, ny) === FOOD) {
-				var tail = {x:nx, y:ny};
-				score++;
-				setFood();
-			}else {
-				var tail = snake.remove();
-				grid.set(EMPTY, tail.x, tail.y);
-				tail.x = nx;
-				tail.y = ny;
-			}
-			grid.set(SNAKE, tail.x, tail.y);
-
-			snake.insert(tail.x, tail.y);
-		}
-	}
-
-	function draw() {
-		var tw = canvas.width/grid.width;
-		var th = canvas.height/grid.height;
+  //GAME OBJECTS
+  var canvas, ctx, keystate, frames, score;
 
 
-		for (var x = 0; x < grid.width; x++) {
-			for (var y = 0; y < grid.height; y++) {
-				switch(grid.get(x, y)) {
-					case EMPTY:
-						ctx.fillStyle = "#fff";
-						break;
-					case SNAKE:
-						ctx.fillStyle = "#00f";
-						break;
-					case FOOD:
-						ctx.fillStyle = "#f00";
-						break;
-				}
-				ctx.fillRect(x*tw, y*th, tw, th);
-			}
-		}
-		ctx.fillStyle = "#000";
-		ctx.fillText("SCORE: "+score, canvas.width-70, 15);
+  function main() {
+    var div = document.createElement('main');
+    canvas = document.createElement("canvas");
+    canvas.width  = COLUMNS*20;
+    canvas.height   = ROWS*20
+    ctx = canvas.getContext("2d");
+    div.appendChild(canvas);
 
-		if(PAUSE) {
-			ctx.fillStyle = "#000";
-			ctx.textAlign = "center";
-			ctx.fillText("PAUSED! Press <space> to continue...", canvas.width/2, canvas.height/2);
-		}
-		if(START) {
-			ctx.fillStyle = "#000";
-			ctx.textAlign = "center";
-			ctx.fillText("PRESS <space> to start the game!", canvas.width/2, canvas.height/2);
-		}
-		if(NOTSUPORTED) {
-			ctx.fillStyle = "#f00";
-			ctx.textAlign = "center";
-			ctx.fillText("YOUR BROWSER DOES NOT SUPPORT WEBSOCKETS!", canvas.width/2, 15);
-		}
+    document.body.appendChild(div);
 
-	}
-	main();
+    ctx.font = "12px Tahoma";
+
+    frames = 0;
+    keystate = {};
+
+    document.addEventListener("keydown", function(evt) {
+      keystate[evt.keyCode] = true;
+    });
+    document.addEventListener("keyup", function(evt) {
+      delete keystate[evt.keyCode];
+    });
+
+    if ("WebSocket" in window) {
+    var ws = new WebSocket("ws://192.168.201.245:9000/servers/00000001/events?topic=200%2F20202066%2Fstate");
+
+      ws.onopen = function() {
+        console.log("Websocket opened!");
+      };
+
+      ws.onmessage = function(evt) {
+        var dt = JSON.parse(evt.data).data;
+        if(dt === 'thatWasEasy') {
+          keystate[KEY_EASY] = true;
+        }else if(dt === 'thatWasHard') {
+          keystate[KEY_EASY] = false;
+        }
+      };
+
+      ws.onclose = function() {
+        console.log("Websocket closed!");
+      }
+    }else {
+      NOTSUPORTED = true;
+    }
+
+    init();
+
+    loop();
+  }
+
+
+  function init() {
+    START = true;
+    PAUSE = false;
+    score = 0;
+    grid.init(EMPTY, COLUMNS, ROWS);
+    var sp = {x:Math.floor(COLUMNS/2), y:ROWS-1}
+    snake.init(UP, sp.x, sp.y);
+    grid.set(SNAKE, sp.x, sp.y);
+
+    setFood();
+  }
+
+
+  function loop() {
+    if(keystate[KEY_SPACE] || keystate[KEY_EASY]) {
+      if(START !== true)
+        PAUSE = !PAUSE;
+
+      START = false;
+      delete keystate[KEY_SPACE];
+      delete keystate[KEY_EASY];
+    }
+
+    if(!PAUSE && !START) {
+      update();
+    }
+    draw();
+
+    window.requestAnimationFrame(loop, canvas);
+  }
+
+  function update() {
+    frames++;
+
+    if(keystate[KEY_LEFT] && snake.direction !== RIGHT) {
+      snake.direction = LEFT;
+    }
+    if(keystate[KEY_UP] && snake.direction !== DOWN) {
+      snake.direction = UP;
+    }
+    if(keystate[KEY_RIGHT] && snake.direction !== LEFT) {
+      snake.direction = RIGHT;
+    }
+    if(keystate[KEY_DOWN] && snake.direction !== UP) {
+      snake.direction = DOWN;
+    }
+
+    if(frames%5 === 0) {
+      var nx = snake.last.x;
+      var ny = snake.last.y;
+
+      switch(snake.direction) {
+        case LEFT: 
+          nx--;
+          break;
+        case UP:
+          ny--;
+          break;
+        case RIGHT:
+          nx++;
+          break;
+        case DOWN:
+          ny++;
+          break;
+      }
+
+      if(grid.get(nx, ny) === SNAKE) {
+        return init();
+      }
+
+      //0 > nx || nx > grid.width-1 || 
+        //0 > ny || ny > grid.height-1 ||
+
+      if(grid.get(nx, ny) === FOOD) {
+        var tail = {x:nx, y:ny};
+        score++;
+        setFood();
+      }else {
+        var tail = snake.remove();
+        grid.set(EMPTY, tail.x, tail.y);
+
+        if(ny < 0) {
+          tail.x = nx;
+          tail.y = ROWS;
+        }else if(nx < 0) {
+          tail.x = COLUMNS-1;
+          tail.y = ny;
+        }else if(ny > grid.height-1){
+          tail.x = nx;
+          tail.y = 0;
+        }else if(nx > grid.width-1) {
+          tail.x = 0;
+          tail.y = ny;
+        }else {
+          tail.x = nx;
+          tail.y = ny;
+        }
+      }
+      grid.set(SNAKE, tail.x, tail.y);
+
+      snake.insert(tail.x, tail.y);
+    }
+  }
+
+  function draw() {
+    var tw = canvas.width/grid.width;
+    var th = canvas.height/grid.height;
+
+
+    for (var x = 0; x < grid.width; x++) {
+      for (var y = 0; y < grid.height; y++) {
+        switch(grid.get(x, y)) {
+          case EMPTY:
+            ctx.fillStyle = "#fff";
+            if((x%2 === 0 && y%2 === 0) || (x%2 === 1 && y%2 === 1)) {
+              ctx.fillStyle = "#eee";
+            }
+            
+            break;
+          case SNAKE:
+            ctx.fillStyle = "#00f";
+            break;
+          case FOOD:
+            ctx.fillStyle = "#f00";
+            break;
+        }
+        ctx.fillRect(x*tw, y*th, tw, th);
+      }
+    }
+    ctx.fillStyle = "#000";
+    ctx.fillText("SCORE: "+score, canvas.width-70, 15);
+
+    if(PAUSE) {
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "center";
+      ctx.fillText("PAUSED! Press <space> to continue...", canvas.width/2, canvas.height/2);
+    }
+    if(START) {
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "center";
+      ctx.fillText("PRESS <space> to start the game!", canvas.width/2, canvas.height/2);
+    }
+    if(NOTSUPORTED) {
+      ctx.fillStyle = "#f00";
+      ctx.textAlign = "center";
+      ctx.fillText("YOUR BROWSER DOES NOT SUPPORT WEBSOCKETS!", canvas.width/2, 15);
+    }
+
+  }
+  main();
 </script>
+          </div>
 
-<div id="footer">
-<p>Created by IOT-MASTERS copyright&copy 2015</p>
-</div>
-</body>
+          <footer>
+            <div class="inner">
+              <p>Created by IOT-MASTERS copyright&copy 2015</p>
+            </div>
+          </footer>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+  </body>
 </html>
