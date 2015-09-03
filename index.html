@@ -26,6 +26,8 @@
 
   <body>
     <header>
+    <a id="header1">direction</a>
+    <a id="header2">direction</a>
     
     <h1><a href="http://eclubprague.com"><img src="images/eclub.png" width="200px" style="margin-right: 100px;"/></a>eClub Snake</h1>
     </header>
@@ -145,68 +147,107 @@
     });
 
     //SNAKE Accelerometer
+    function process(){
+      var tmp="";
+      var val=0;
+
+      var absX = Math.abs(x);
+      var absY = Math.abs(y);
+
+      if(x<0){
+        if(y<0){
+          if(absX>absY){
+            tmp="left";
+            val=absX;
+          }else{
+            tmp="up";
+            val=absY;
+          }
+        }else{
+          if(absX>absY){
+            tmp="left";
+            val=absX;
+          }else{
+            tmp="down";
+            val=absY;
+          }
+        }
+      }else{
+        if(y<0){
+          if(absX>absY){
+            tmp="right";
+            val=absX;
+          }else{
+            tmp="up";
+            val=absY;
+          }
+        }else{
+          if(absX>absY){
+            tmp="right";
+            val=absX;
+          }else{
+            tmp="down";
+            val=absY;
+          }
+        }
+      }
+      if(val>sensitivity){
+        dir=tmp;
+      } else {
+        dir="----";               
+      }
+      document.getElementById("header1").innerHTML = dir;
+
+      if(dir === "up") {
+        keystate[KEY_UP] = true;
+        delete keystate[KEY_RIGHT];
+        delete keystate[KEY_DOWN];
+        delete keystate[KEY_LEFT];
+      }else if(dir === "down") {
+        keystate[KEY_DOWN] = true;
+        delete keystate[KEY_RIGHT];
+        delete keystate[KEY_UP];
+        delete keystate[KEY_LEFT];
+      }else if(dir === "left") {
+        keystate[KEY_LEFT] = true;
+        delete keystate[KEY_RIGHT];
+        delete keystate[KEY_DOWN];
+        delete keystate[KEY_UP];
+      }else if(dir === "right") {
+        keystate[KEY_RIGHT] = true;
+        delete keystate[KEY_DOWN];
+        delete keystate[KEY_UP];
+        delete keystate[KEY_LEFT];
+      }
+    }
+
     var x = NaN;
     var y = NaN;
-    dir = "----";
-    dirVal = 0; 
-    var sensitivity = 0.2;
+    var battery = NaN;
+    var dir = "----";
+    var dirVal = 0; 
+    var sensitivity = 0.25; 
 
     if ("WebSocket" in window) {
       var ws1 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");                  
-               var ws2 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");                   
-                
-               var a = function (evt) { 
-                  var topic = JSON.parse(evt.data).topic;
-                  var data = JSON.parse(evt.data).data;
-                  
-                  if(topic.indexOf("accX")!=-1){
-                    if(Math.abs(data)>sensitivity){
-                      if(Math.abs(data)>Math.abs(dirVal)){
-                        if(data<0){
-                          dir="left"  
-                        } else {
-                          dir="right"
-                        }
-                        dirVal=data;
-                      }
-                    } 
-                  }
-                  
-                  
-                  if(topic.indexOf("accY")!=-1){
-                    if(Math.abs(data)>sensitivity){
-                      if(Math.abs(data)>Math.abs(dirVal)){
-                        if(data<0){
-                          dir="up"  
-                        } else {
-                          dir="down"
-                        }
-                        dirVal=data;
-                      }
-                    }
-                  }
-                  
-                  //document.getElementById("header").innerHTML = dir;
+      var ws2 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");                    
+      var ws3 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2Fvbat");   
 
-                   //Set the keys:
-               if(dir === "up") {
-                  keystate[KEY_UP] = true;
-               }else if(dir === "down") {
-                  keystate[KEY_RIGHT] = true;
-               }else if(dir === "left") {
-                  keystate[KEY_LEFT] = true;
-               }else if(dir === "right") {
-                  keystate[KEY_RIGHT] = true;
-               }else if(dir === "----") {
-                  delete keystate[KEY_RIGHT];
-                  delete keystate[KEY_DOWN];
-                  delete keystate[KEY_UP];
-                  delete keystate[KEY_LEFT];
-               }
-                  
-               };   
-               
-               ws1.onmessage =  ws2.onmessage = a; 
+      ws1.onmessage = function (evt) { 
+        x = JSON.parse(evt.data).data;  
+        process();                  
+      }; 
+
+      ws2.onmessage = function (evt) {                  
+        y = JSON.parse(evt.data).data;    
+        process();                  
+      };    
+
+      ws3.onmessage = function (evt) {
+        battery = JSON.parse(evt.data).data; 
+        battery=(battery-3200)/16.8;
+        document.getElementById("header2").innerHTML = battery.toFixed(1)+"%";
+      } 
     }else {
       NOTSUPORTED = true;
     }
