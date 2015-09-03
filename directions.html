@@ -1,68 +1,48 @@
 <!DOCTYPE HTML>
 <html>
-   <head>
-	 </head>
-   <body>
-      <h1 id="header">direction</h1>
-
-      <script type="text/javascript">
-            var x = NaN;
+	<head>
+	</head>
+   	<body>
+    	<h1 id="header">direction</h1>
+		<script type="text/javascript">
+        	var x = NaN;
             var y = NaN;
             var dir = "----";
             var dirVal = 0; 
-            var sensitivity = 0.2; 
+            var sensitivity = 0.15; 
               
             //tohle smaž a nuluj ty hodnoty po posunutí hada nigga
             setInterval(function () {
                dir = "----";
                dirVal = 0;  
-            }, 150);            
+            }, 200);            
          
             if ("WebSocket" in window){
-               var ws1 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");    				       
-               var ws2 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");     				       
-               	
-               var a = function (evt) { 
-                  var topic = JSON.parse(evt.data).topic;
-                  var data = JSON.parse(evt.data).data;
-                  
-                  if(topic.indexOf("accX")!=-1){
+            	var ws1 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");    				       
+               	var ws2 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");     				       
+                              
+               	ws1.onmessage = function (evt) { 
+                  	var data = JSON.parse(evt.data).data;
                     if(Math.abs(data)>sensitivity){
-                      if(Math.abs(data)>Math.abs(dirVal)){
-                        if(data<0){
-                          dir="left"  
-                        } else {
-                          dir="right"
-                        }
-                        dirVal=data;
-                      }
+                      	if(Math.abs(data)>Math.abs(dirVal)){
+                        	dir=(data<0)?"left":"right";
+                        	dirVal=data;
+                      	}
                     } 
-                  }
-                  
-                  
-                  if(topic.indexOf("accY")!=-1){
+                  	document.getElementById("header").innerHTML = dir;
+                }; 
+
+               	ws2.onmessage = function (evt) {                  
+                  	var data = JSON.parse(evt.data).data;  
                     if(Math.abs(data)>sensitivity){
-                      if(Math.abs(data)>Math.abs(dirVal)){
-                        if(data<0){
-                          dir="up"  
-                        } else {
-                          dir="down"
-                        }
-                        dirVal=data;
-                      }
+                      	if(Math.abs(data)>Math.abs(dirVal)){
+                      		dir=(data<0)?"up":"down";
+                        	dirVal=data;
+                      	}
                     }
-                  }
-                  
-                  document.getElementById("header").innerHTML = dir;
-                  
-               };  	
-               
-               ws1.onmessage =   ws2.onmessage = a;		
+                  	document.getElementById("header").innerHTML = dir;
+                }; 		
             }
-            
-            
-         
-      </script>
-      
-   </body>
+    	</script>
+   	</body>
 </html>
