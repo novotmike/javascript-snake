@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+        background-color:lightgray;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" ></canvas>
+    <script>
+      
+
+      window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 30);
+        };
+      })();
+
+      function initBalls() {
+        balls = [];
+        balls.push(new Ball(300,300, 0,0, '#3A5BCD'));
+        return balls;
+      }
+      
+      function updateBalls(canvas, balls, timeDiff) {
+        var context = canvas.getContext('2d');
+        var collisionDamper = 0.3;
+        var floorFriction = 0.001 * timeDiff;
+
+        for(var n = 0; n < balls.length; n++) {
+          var ball = balls[n];
+          // set ball position based on velocity
+          ball.y += ball.vy;
+          ball.x += ball.vx;
+                 
+          // floor friction
+          /*if(ball.vx > 0) {
+            ball.vx -= floorFriction;
+          }
+          else if(ball.vx < 0) {
+            ball.vx += floorFriction;
+          }
+          if(ball.vy > 0) {
+            ball.vy -= floorFriction;
+          }
+          else if(ball.vy < 0) {
+            ball.vy += floorFriction;
+          }*/
+
+          // floor condition
+          if(ball.y > (canvas.height - ball.radius)) {
+            ball.y = canvas.height - ball.radius - 2;
+            ball.vy *= -1;
+            ball.vy *= (1 - collisionDamper);
+          }
+
+          // ceiling condition
+          if(ball.y < (ball.radius)) {
+            ball.y = ball.radius + 2;
+            ball.vy *= -1;
+            ball.vy *= (1 - collisionDamper);
+          }
+
+          // right wall condition
+          if(ball.x > (canvas.width - ball.radius)) {
+            ball.x = canvas.width - ball.radius - 2;
+            ball.vx *= -1;
+            ball.vx *= (1 - collisionDamper);
+          }
+
+          // left wall condition
+          if(ball.x < (ball.radius)) {
+            ball.x = ball.radius + 2;
+            ball.vx *= -1;
+            ball.vx *= (1 - collisionDamper);
+          }
+        }
+      }
+      function Ball(x, y, vx, vy, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+        this.radius = 20;
+      }
+      function animate(canvas, balls, lastTime) {
+        var context = canvas.getContext('2d');
+
+        // update
+        var date = new Date();
+        var time = date.getTime();
+        var timeDiff = time - lastTime;
+        updateBalls(canvas, balls, timeDiff);
+        lastTime = time;
+
+        // clear
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // render
+
+        for(var n = 0; n < balls.length; n++) {
+          var ball = balls[n];
+          context.beginPath();
+          context.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI, false);
+          context.fillStyle = ball.color;
+          context.fill();
+
+        }
+
+        // request new frame
+        requestAnimFrame(function() {
+          animate(canvas, balls, lastTime);
+        });
+      }
+      var canvas = document.getElementById('myCanvas');
+      canvas.width = 700;
+      canvas.height = 700; //document.height is obsolete
+
+      var balls = initBalls();
+      var date = new Date();
+      var time = date.getTime();
+      var x=0;
+      var y=0;
+       
+      animate(canvas, balls, time);
+
+
+      if ("WebSocket" in window) {
+        var ws1 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");                  
+        var ws2 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");   
+
+        ws1.onmessage = function (evt) { 
+          x = JSON.parse(evt.data).data;  
+          if(Math.abs(x)>0.04){
+            if(Math.abs(x)>0.5){
+              x=Math.sign(x)*0.5;
+            }
+            balls[0].vx+=x*2; 
+          }  
+          
+                    
+        }; 
+
+        ws2.onmessage = function (evt) {                  
+          y = JSON.parse(evt.data).data; 
+          if(Math.abs(y)>0.04){
+            if(Math.abs(y)>0.5){
+              y=Math.sign(y)*0.5;
+            }
+            balls[0].vy+=y*2; 
+          }  
+              
+                           
+        };  
+        
+      }
+
+    </script>
+  </body>
+</html>
