@@ -132,9 +132,8 @@
 
 
       if ("WebSocket" in window) {
-        var ws1 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");                  
-        var ws2 = new WebSocket("ws://10.0.0.5:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");   
-
+        var ws1 = new WebSocket("ws://192.168.201.245:9000/servers/00000001/events?topic=89%2F20202002%2FaccX");                  
+        var ws2 = new WebSocket("ws://192.168.201.245:9000/servers/00000001/events?topic=89%2F20202002%2FaccY");  
         ws1.onmessage = function (evt) { 
           x = JSON.parse(evt.data).data;  
           if(Math.abs(x)>0.04){
