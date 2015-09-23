@@ -260,6 +260,19 @@
       dir = "----";
       dirVal = 0;
     }
+    //Check for food
+    var isFood = false;
+    for (var x = 0; x < grid.width; x++) {
+      for (var y = 0; y < grid.height; y++) {
+        if(grid.get(x, y) === FOOD) {
+          isFood = true;
+        }
+      }
+    }
+    if(!isFood) {
+      setFood();
+    }
+
     draw();
 
     window.requestAnimationFrame(loop, canvas);
