@@ -1,52 +1,48 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-	<style>
-      body {
-        margin: 0px;
-        padding: 0px;
-        background-color:lightgray;
-		position: relative;
-		height: 100%;
-      }
-      
-      h1 {
-	position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+	</head>
+   	<body>
+    	<h1 id="header1">Tom isn't here</h1><br>
+    	<h1 id="header2">direction</h1>
+		<script type="text/javascript">
+        	
+              //-18 u beaconu
+              //-80
+              
+            var isHere=undefined;
+                      
+         
+            if ("WebSocket" in window){
+            	var ws1 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Frssi");    	
+            	var ws2 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fstate");  
+            	var ws3 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fbutton");  			       
+               	
+               	ws1.onmessage = function (evt) { 
+                  	x = JSON.parse(evt.data).data;  
+                  	x=Math.pow(10,((x+56)/(-30))).toFixed(1);
+                  	
+                  	document.getElementById("header1").innerHTML = "Tom is "+x+" m away";             
+                }; 
 
-	  font-size: 350px;
-    }
-    </style>
-    </head>
-    
-	<body>
-		<h1 id="a"></h1>
-		<script>
-			
-			
-			
-			
-			setInterval(function(){
-				var xmlHttp = new XMLHttpRequest();
-				xmlHttp.open( "GET","https://147.32.107.139:8082/registered_sensors/30303003", false ); // false for synchronous request
-				xmlHttp.send( null );
-				obj = JSON.parse(xmlHttp.responseText);
-				var prev = 0;
-				var count = 0;
-				obj.measured[0].items.forEach(function(entry) {
-					//document.getElementById("a").innerHTML+= entry.value+"<br>";
-					if(prev==0&&entry.value==1)count++;
-					prev=entry.value;
-				});
-				document.getElementById("a").innerHTML=count;
-			}, 1000);
-			
-			
-			
-			
-		</script>
-	  
-	</body>
+				ws2.onmessage = function (evt) { 
+                  	isHere = JSON.parse(evt.data).data; 
+                  	if(isHere==0){
+						document.getElementById("header1").innerHTML = "Tom isn't here";             
+					} 
+                }; 
+                
+                ws3.onmessage = function (evt) { 
+                  	x = JSON.parse(evt.data).data;  
+                  	document.getElementById("header2").innerHTML = x;             
+                }; 
+               
+            }
+
+            	
+
+            	
+            
+    	</script>
+   	</body>
 </html>
