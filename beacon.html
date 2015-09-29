@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+	</style>
+	</head>
+   	<body>
+    	<h1 id="header1"></h1><br>
+    	<h1 id="header2"></h1><br>
+    	<h1 id="header3">pir</h1>
+    	<h1 id="header4"></h1>
+    	<h1 id="header5"></h1>
+    	<h1 id="header6"></h1>
+    	<h1 id="header7"></h1>
+    	
+    	<script type="text/javascript">
+        	
+        	var b1=new Object();
+        	var b2=new Object();
+        	var p1=new Object();
+        	var name;
+        	
+        	//dveře C91C52361A4E
+        	//stoly EF5220BFC1A9
+                      
+         
+            if ("WebSocket" in window){
+            	var beacon1 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000000/events?topic=130%2FC91C52361A4E%2Fdevice");    	
+            	var beacon2 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000000/events?topic=130%2FEF5220BFC1A9%2Fdevice");  
+            	var pir = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=129%2F30303003%2Fpir");  			       
+               	
+               	beacon1.onmessage = function (evt) { 
+                  	b1.timestamp = JSON.parse(evt.data).timestamp;
+                  	var tmp = JSON.parse(JSON.parse(evt.data).data);
+                  	b1.email=tmp.email;
+                  	b1.rssi=tmp.rssi;
+                  	name = b1.email;
+                  	
+                  	document.getElementById("header1").innerHTML = b1.timestamp+" "+b1.email+" "+b1.rssi;  
+					
+                }; 
+
+				beacon2.onmessage = function (evt) { 
+                  	b2.timestamp = JSON.parse(evt.data).timestamp;
+                  	var tmp = JSON.parse(JSON.parse(evt.data).data);
+                  	b2.email=tmp.email;
+                  	b2.rssi=tmp.rssi;
+                  	name = b2.email;
+                  	
+                  	document.getElementById("header2").innerHTML = b2.timestamp+" "+b2.email+" "+b2.rssi;  
+					
+                }; 
+                
+                pir.onmessage = function (evt) { 
+                  	p1 = JSON.parse(evt.data).data;  
+                  	document.getElementById("header3").innerHTML = "pir: "+p1;             
+                }; 
+                
+                var interval = 3000;
+                
+                var process = function(param){ 
+					var a = new Date().getTime();
+					b1.valid=(b1.timestamp>(a-interval))?1:0;
+					b2.valid=(b2.timestamp>(a-interval))?1:0;
+					
+					//document.getElementById("header4").innerHTML = b1.valid + " "+b2.valid;  
+					
+					var text = "";
+					var index = "";
+					if(b2.valid&&!b1.valid){
+						text+="u stolu";
+					} else if(b1.valid&&!b2.valid){
+						text+="u dveri";
+						
+					} else if(!b1.valid&&!b2.valid){
+						text+="no idea";
+					
+					} else if(b1.valid&&b2.valid){
+						index = Math.round(((b1.rssi/(b1.rssi+b2.rssi))-0.5)*10000);
+						if(index>-2){
+							text+="u stolu";
+						} else if(index<-300){
+							text+="u dveri";
+						} else {
+							text+="uprostred";
+						
+						}
+						
+					}
+					
+					text = name+" je "+text;
+					document.getElementById("header5").innerHTML = text; 
+					document.getElementById("header6").innerHTML = index; 
+				}               
+                
+                setInterval(process, interval/2);
+               
+            }
+
+            	
+
+            	
+            
+    	</script>
+   	</body>
+</html>

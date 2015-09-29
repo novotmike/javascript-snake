@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+	</style>
+	</head>
+   	<body>
+    	<a id="header1"></a><br>
+    	<h1 id="header2"></h1><br>
+    	<a id="header3"></a><br>
+    	<a id="header4"></a><br>
+    	<a id="header5"></a><br>
+    	<a id="header6"></a><br>
+    	<a id="header7"></a><br>
+    	
+    	<script type="text/javascript">
+        	
+        	var b1=new Object();
+        	var b2=new Object();
+        	var p1=new Object();
+        	var name;
+        	
+        	//dveře C91C52361A4E
+        	//stoly EF5220BFC1A9
+                      
+         
+            if ("WebSocket" in window){
+				var people = [];
+			
+				var beacons=[];
+				
+				beacons[0]=new Object();
+				beacons[0].name="Beacon u dveri";
+				beacons[0].websocket = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000000/events?topic=130%2FC91C52361A4E%2Fdevice");    	
+   	
+            	beacons[1]=new Object();
+            	beacons[1].name="Beacon u stolu";
+				beacons[1].websocket = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000000/events?topic=130%2FEF5220BFC1A9%2Fdevice");  
+
+				pir = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=129%2F30303003%2Fpir");  
+            		       
+               	
+             /*  	for (var key in beacons){
+					beacons[key].websocket.onmessage = function (evt) {
+						
+						var timestamp = JSON.parse(evt.data).timestamp;
+						var payload = JSON.parse(JSON.parse(evt.data).data);
+						
+						if(people[payload.email]===undefined){
+							people[payload.email]=new Object();
+							people[payload.email].beacon=[];
+						}
+						
+						if(people[payload.email].beacon[key]===undefined){
+							people[payload.email].beacon[key]=new Object();
+						}
+						
+						people[payload.email].beacon[key].rssi=payload.rssi;
+						people[payload.email].beacon[key].timestamp=timestamp;
+						refresh(key);
+					} 
+				}*/
+				
+				beacons[0].websocket.onmessage = function (evt) {
+						
+						var timestamp = JSON.parse(evt.data).timestamp;
+						var payload = JSON.parse(JSON.parse(evt.data).data);
+						
+						if(people[payload.email]===undefined){
+							people[payload.email]=new Object();
+							people[payload.email].beacon=[];
+						}
+						
+						if(people[payload.email].beacon[0]===undefined){
+							people[payload.email].beacon[0]=new Object();
+							people[payload.email].beacon[0].valid=false;
+						}
+						
+						people[payload.email].beacon[0].rssi=payload.rssi;
+						people[payload.email].beacon[0].timestamp=timestamp;
+						
+						refresh(0);
+					} 
+					beacons[1].websocket.onmessage = function (evt) {
+						
+						var timestamp = JSON.parse(evt.data).timestamp;
+						var payload = JSON.parse(JSON.parse(evt.data).data);
+						
+						if(people[payload.email]===undefined){
+							people[payload.email]=new Object();
+							people[payload.email].beacon=[];
+						}
+						
+						if(people[payload.email].beacon[1]===undefined){
+							people[payload.email].beacon[1]=new Object();
+							people[payload.email].beacon[1].valid=false;
+						}
+						
+						people[payload.email].beacon[1].rssi=payload.rssi;
+						people[payload.email].beacon[1].timestamp=timestamp;
+						
+						refresh(1);
+					} 
+                
+                function refresh(type){
+					var treshold = 4000;
+					document.getElementById("header1").innerHTML="";
+					for(keyPeople in people){
+						var date = new Date().getTime();
+						
+						for(keyBeacon in people[keyPeople].beacon){
+							people[keyPeople].beacon[keyBeacon].valid = (people[keyPeople].beacon[keyBeacon].timestamp>(date-treshold));
+							//document.getElementById("header1").innerHTML+=beacons[keyBeacon].name+" "+people[keyPeople].beacon[keyBeacon].rssi+" "+people[keyPeople].beacon[keyBeacon].timestamp+" "+date+" "+people[keyPeople].beacon[keyBeacon].valid+"<br>";
+						}
+						
+						if(people[keyPeople].beacon[0].valid&&people[keyPeople].beacon[1].valid){
+							if(type!=-1)
+								people[keyPeople].position=(people[keyPeople].beacon[0].rssi/(people[keyPeople].beacon[0].rssi+people[keyPeople].beacon[1].rssi));
+						} else if(!people[keyPeople].beacon[0].valid&&people[keyPeople].beacon[1].valid){
+							if(type!=-1)
+								people[keyPeople].position=1;
+						} else if(people[keyPeople].beacon[0].valid&&!people[keyPeople].beacon[1].valid){
+							if(type!=-1)
+								people[keyPeople].position=0;
+						} else {
+							if(type==-1)
+								people[keyPeople].position=-1;
+						}
+						
+						
+						
+						document.getElementById("header1").innerHTML+=keyPeople+"<br>"+people[keyPeople].position+"<br>";
+						
+					}
+					
+				}
+				
+				pir.onmessage = function(evt){
+					var data = JSON.parse(evt.data).data;
+					if(data==1){
+						
+						var name = "nekdo"; 
+						var intensity = 0.57;
+						
+						
+						for(keyPeople1 in people){
+							if(people[keyPeople1].position<intensity&&people[keyPeople1].position>-1){
+								if(people[keyPeople1].position>-1){
+									intensity =people[keyPeople1].position;
+									name = keyPeople1;
+								}
+							}
+						}
+						
+						document.getElementById("header2").innerHTML="prosel "+name;
+					} else {
+						document.getElementById("header2").innerHTML="";
+					}
+					
+				};
+				
+				setInterval(function(){
+					refresh(-1);
+				},500);
+               
+				
+               
+               
+               
+               
+            }
+
+            	
+
+            	
+            
+    	</script>
+   	</body>
+</html>

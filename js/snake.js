@@ -195,10 +195,10 @@
     var sensitivity = 0.25; 
 
     if ("WebSocket" in window) {
-      var ws1 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");                  
-      var ws2 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");                    
-      var ws3 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=89%2F20202002%2Fvbat");   
-      var ws4 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fbutton");
+      var ws1 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=89%2F20202002%2FaccX");                  
+      var ws2 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=89%2F20202002%2FaccY");                    
+      var ws3 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=89%2F20202002%2Fvbat");   
+      var ws4 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fbutton");
       ws1.onmessage = function (evt) { 
         x = JSON.parse(evt.data).data;  
         process();                  

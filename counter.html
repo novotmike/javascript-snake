@@ -3,7 +3,7 @@
 	<head>
 		<style>
 		h1{
-			font-size:200px;
+			font-size:100px;
 		}
 	</style>
 	</head>
@@ -20,9 +20,9 @@
                       
          
             if ("WebSocket" in window){
-            	var ws1 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Frssi");    	
-            	var ws2 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fstate");  
-            	var ws3 = new WebSocket("ws://mlha-139.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fbutton");  			       
+            	var ws1 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Frssi");    	
+            	var ws2 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fstate");  
+            	var ws3 = new WebSocket("ws://zettor.sin.cvut.cz:1337/servers/00000001/events?topic=124%2FFFFFF0000E6D%2Fbutton");  			       
                	
                	ws1.onmessage = function (evt) { 
                   	x = JSON.parse(evt.data).data;  
