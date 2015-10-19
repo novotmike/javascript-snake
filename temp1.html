@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+		h1{
+			font-size:200px;
+		}
+		</style>
+	</head>
+   	<body>
+		<a id="id1"></a><br>   
+		<a id="id2"></a>  
+		<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
+		<div id="chart_div" style="width: 1500px; height: 800px;"></div> 
+		<script type="text/javascript">
+			var id1 = document.getElementById("id1");
+			var id2 = document.getElementById("id2");
+			
+			var uuid = "30303001";
+			
+			function httpGetAsync(theUrl, callback){
+				var xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = function() { 
+					if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+					callback(xmlHttp.responseText);
+				}
+				xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+				xmlHttp.send(null);
+			} 
+			
+			function cb(str){
+				var a = JSON.parse(str);
+				
+				var sensor = a.sensor;
+			  
+				var temp = a.measured[0];
+				var pressure = a.measured[2];
+				var vbat = a.measured[4];
+			  
+				var array= new Array();
+				var array1= new Array();
+				var array2= new Array();
+				
+				var ab= new Array();
+				var ab1= new Array();
+				var ab2= new Array();
+				
+				console.log(temp);
+				console.log(pressure);
+				console.log(vbat);
+				
+				var resolution = 200000;
+				var maxRise = 0.05;
+				
+				var tmppp = Math.min(temp.items.length,Math.min(pressure.items.length,vbat.items.length));
+				
+				//merging
+				for(var i=0;i<tmppp;i++){
+					if(i>0){
+						if(Math.abs(temp.items[i].value-temp.items[i-1].value)<(temp.items[i-1].value*maxRise)){
+							var k1 = Math.round(new Date(temp.items[i].time).getTime()/resolution);
+							if(isNaN(array[k1])){
+								array[k1]=0;
+								ab[k1]=0;
+							}							
+							array[k1]+=parseFloat(temp.items[i].value);							
+							ab[k1]+=1;
+						}
+						if(Math.abs(vbat.items[i].value-vbat.items[i-1].value)<(vbat.items[i-1].value*maxRise)){
+							var k2 = Math.round(new Date(vbat.items[i].time).getTime()/resolution);
+							if(isNaN(array1[k2])){
+								array1[k2]=0;
+								ab1[k2]=0;
+							}
+							array1[k2]+=parseFloat(vbat.items[i].value);
+							ab1[k2]+=1;
+						}
+						if(Math.abs(pressure.items[i].value-pressure.items[i-1].value)<(pressure.items[i-1].value*maxRise)){
+							var k3 = Math.round(new Date(pressure.items[i].time).getTime()/resolution);
+							if(isNaN(array2[k3])){
+								array2[k3]=0;
+								ab2[k3]=0;
+							}
+							array2[k3]+=parseFloat(pressure.items[i].value);
+							ab2[k3]+=1;
+						}
+					} else {
+						array[Math.round(new Date(temp.items[i].time).getTime()/resolution)]=parseFloat(temp.items[i].value);
+						array1[Math.round(new Date(vbat.items[i].time).getTime()/resolution)]=parseFloat(vbat.items[i].value);
+						array2[Math.round(new Date(pressure.items[i].time).getTime()/resolution)]=parseFloat(pressure.items[i].value);
+						ab[Math.round(new Date(temp.items[i].time).getTime()/resolution)]=1;
+						ab1[Math.round(new Date(vbat.items[i].time).getTime()/resolution)]=1;
+						ab2[Math.round(new Date(pressure.items[i].time).getTime()/resolution)]=1;
+					}					
+					
+				}
+				
+				
+				var col = new Array();
+				var fpcount= 3;
+				
+				for (var key in array) {
+					var c1 = new Array();
+					c1.push(new Date(key*resolution));
+					c1.push(parseFloat((array[key]/ab[key]).toFixed(fpcount)));
+					c1.push(parseFloat((array1[key]/ab1[key]).toFixed(fpcount)));
+					c1.push(parseFloat((array2[key]/ab2[key]).toFixed(fpcount)));
+					col.push(c1);
+				}
+
+				var data = new google.visualization.DataTable();
+				data.addColumn('datetime', 'date');
+				data.addColumn('number', 'Temperature [C]');
+				data.addColumn('number', 'Battery [mV]');
+				data.addColumn('number', 'Pressure [hPa]');
+
+				data.addRows(col);
+
+				//data.addRows([['a',11],['b',13],['c',5]]);
+				
+				var options = {
+				  title: 'Thermometer '+uuid+' '+sensor.description,
+				  curveType: 'function',
+				  hAxis: {showTextEvery: 1},
+				  vAxes: {
+						  0: {logScale: false},
+						  1: {logScale: false},
+						  2: {logScale: false}},
+				  series:{
+					      0:{targetAxisIndex:0},
+						  1:{targetAxisIndex:1},
+						  2:{targetAxisIndex:2}
+						 }
+				};
+				
+
+				var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+				chart.draw(data, options);
+			}
+			
+					
+			  
+			
+			google.load('visualization', '1', {packages: ['corechart']});
+			google.setOnLoadCallback(httpGetAsync("http://zettor.sin.cvut.cz:8080/registered_sensors/"+uuid,cb));   	      
+    	</script>
+   	</body>
+</html>

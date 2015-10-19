@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	 <style>
+   </style>
+	</head>
+  <body>
+    <a id="header1"></a><br>
+    <img id="id1">
+    <script type="text/javascript" src="gravatar.js"></script>
+    <script type="text/javascript">
+      var url = gravatar("valacpav@fel.cvut.cz");
+      var newImg = new Image();
+      newImg.onload = function() {
+          document.getElementById('id1').src = this.src;
+      }
+
+      setTimeout(function(){
+        newImg.src = gravatar("valacpav@fel.cvut.cz");
+      },0);
+      setTimeout(function(){
+        newImg.src = gravatar("pikoutom@fel.cvut.cz");
+      },3000);
+      setTimeout(function(){
+        newImg.src = gravatar("sedivja2@fel.cvut.cz");
+      },6000);
+
+
+    </script>
+  </body>
+</html>
